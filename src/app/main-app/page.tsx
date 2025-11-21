@@ -14,7 +14,7 @@ type SidebarSection = "home" | "profile" | "analytics" | "knowledge";
 type TaskType = "homework" | "assessment" | "lesson-plan";
 type ContentType = "video" | "presentation" | "flashcard" | "pdf" | "mindmap";
 type HomeStep = 1 | 2 | 3 | 4;
-type HomeView = "builder" | "flashcards" | "pdf" | "presentation" | "video";
+type HomeView = "builder" | "flashcards" | "pdf" | "presentation" | "video" | "mindmap";
 
 type UploadMode = "none" | "upload" | "knowledge";
 
@@ -207,53 +207,62 @@ const IconLibrary = () => (
   </svg>
 );
 
-const IconBook = () => (
-  <svg
-    viewBox="0 0 24 24"
-    width="28"
-    height="28"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M4 4h12a2 2 0 0 1 2 2v12H6a2 2 0 0 1-2-2z" />
-    <path d="M4 18h14" />
-  </svg>
-);
-
-const IconCheckDoc = () => (
-  <svg
-    viewBox="0 0 24 24"
-    width="28"
-    height="28"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M9 11l3 3L22 4" />
-    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-  </svg>
-);
-
+// Lesson Planning Icon - Pages/Documents with Video
 const IconClipboard = () => (
   <svg
     viewBox="0 0 24 24"
-    width="28"
-    height="28"
+    width="24"
+    height="24"
     fill="none"
     stroke="currentColor"
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
   >
-    <rect x="8" y="3" width="8" height="4" rx="1" ry="1" />
-    <path d="M9 3h-1a3 3 0 0 0-3 3v13a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3h-1" />
-    <line x1="9" y1="12" x2="15" y2="12" />
-    <line x1="9" y1="16" x2="15" y2="16" />
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <line x1="9" y1="13" x2="15" y2="13"></line>
+    <line x1="9" y1="17" x2="15" y2="17"></line>
+    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+  </svg>
+);
+
+// Student Assessment Icon - Test Paper with Checkmarks
+const IconCheckDoc = () => (
+  <svg
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <polyline points="9 11 11 13 15 9"></polyline>
+    <circle cx="12" cy="16" r="1"></circle>
+  </svg>
+);
+
+// Homework Assignment Icon - Notebook/Book
+const IconBook = () => (
+  <svg
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+    <line x1="9" y1="8" x2="15" y2="8"></line>
+    <line x1="9" y1="12" x2="15" y2="12"></line>
+    <line x1="9" y1="16" x2="13" y2="16"></line>
   </svg>
 );
 
@@ -385,6 +394,9 @@ const MainAppPage: React.FC = () => {
 
   // Video
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Mind Map
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
   // Profile
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -771,10 +783,13 @@ const MainAppPage: React.FC = () => {
     } else if (selectedContentType === "presentation") {
       targetView = "presentation";
       text = "Generating Presentation Slides...";
+    } else if (selectedContentType === "mindmap") {
+      targetView = "mindmap";
+      text = "Generating Mind Map...";
     }
 
     if (!targetView) {
-      // Mind map or other future types: simple success
+      // Other future types: simple success
       // eslint-disable-next-line no-alert
       alert(
         `Content Created Successfully!\n\nYour ${selectedTask} with ${selectedContentType} has been created.\n\nAll details have been saved and students will be notified.`,
@@ -958,57 +973,213 @@ const MainAppPage: React.FC = () => {
         {/* Step 1 */}
         {homeStep === 1 && (
           <div className="home-cards-container">
-            <div className="task-card disabled">
-              <div className="coming-soon-badge">Coming Soon</div>
-              <div className="task-icon-box">
-                <IconBook />
-              </div>
-              <div className="task-card-content">
-                <div className="task-card-title">
-                  Homework Assignment
-                </div>
-                <div className="task-card-description">
-                  Create, distribute, and manage homework assignments
-                  for your students
-                </div>
-              </div>
-              <div className="task-card-arrow">→</div>
-            </div>
-
-            <div className="task-card disabled">
-              <div className="coming-soon-badge">Coming Soon</div>
-              <div className="task-icon-box">
-                <IconCheckDoc />
-              </div>
-              <div className="task-card-content">
-                <div className="task-card-title">
-                  Student Assessment
-                </div>
-                <div className="task-card-description">
-                  Design comprehensive tests and evaluate student
-                  performance metrics
-                </div>
-              </div>
-              <div className="task-card-arrow">→</div>
-            </div>
-
+            {/* Lesson Planning - First, Active */}
             <button
               type="button"
-              className="task-card"
+              className="task-card-subject task-card-lesson"
               onClick={() => handleSelectTask("lesson-plan")}
             >
-              <div className="task-icon-box">
-                <IconClipboard />
-              </div>
-              <div className="task-card-content">
-                <div className="task-card-title">Lesson Planning</div>
-                <div className="task-card-description">
-                  Structure and organize detailed lesson plans with
-                  learning objectives
+              <div className="task-card-header">
+                <div className="task-title-with-icon">
+                  <div className="task-type-icon task-icon-lesson">
+                    <IconClipboard />
+                  </div>
+                  <h3 className="task-title">Lesson Planning</h3>
+                </div>
+                <div className="task-arrow-btn">
+                  <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </div>
               </div>
-              <div className="task-card-arrow">→</div>
+              <div className="task-card-content">
+                <div className="presentation-preview">
+                  <div className="slide-mini">
+                    <div className="slide-number">1</div>
+                    <div className="slide-content-preview">
+                      <svg className="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="9" y1="12" x2="15" y2="12"></line>
+                        <line x1="9" y1="16" x2="15" y2="16"></line>
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="slide-mini">
+                    <div className="slide-number">2</div>
+                    <div className="slide-content-preview">
+                      <svg className="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="slide-mini">
+                    <div className="slide-number">3</div>
+                    <div className="slide-content-preview">
+                      <svg className="slide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div className="lesson-type-description">
+                  <p className="lesson-type-title">Structured Lesson Plans</p>
+                  <p className="lesson-type-text">Structure and organize detailed lesson plans with learning objectives</p>
+                </div>
+                <div className="lesson-stats">
+                  <span className="stat-item">
+                    <svg className="stat-icon" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                      <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clipRule="evenodd"/>
+                    </svg>
+                    AI-Powered
+                  </span>
+                  <span className="stat-item">
+                    <svg className="stat-icon" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4z" clipRule="evenodd"/>
+                    </svg>
+                    Customizable
+                  </span>
+                </div>
+              </div>
             </button>
+
+            {/* Student Assessment - Second, Coming Soon */}
+            <div className="task-card-subject disabled task-card-assessment">
+              <div className="coming-soon-badge">Coming Soon</div>
+              <div className="task-card-header">
+                <div className="task-title-with-icon">
+                  <div className="task-type-icon task-icon-assessment">
+                    <IconCheckDoc />
+                  </div>
+                  <h3 className="task-title">Student Assessment</h3>
+                </div>
+                <div className="task-arrow-btn">
+                  <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div className="task-card-content">
+                <div className="assessment-preview-box">
+                  <div className="assessment-test-icon">
+                    <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <polyline points="9 11 11 13 15 9"></polyline>
+                      <line x1="9" y1="16" x2="15" y2="16"></line>
+                    </svg>
+                  </div>
+                  <div className="assessment-checkmarks">
+                    <div className="checkmark-item">
+                      <svg className="checkmark-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </div>
+                    <div className="checkmark-item">
+                      <svg className="checkmark-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </div>
+                    <div className="checkmark-item">
+                      <svg className="checkmark-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div className="lesson-type-description">
+                  <p className="lesson-type-title">Comprehensive Testing</p>
+                  <p className="lesson-type-text">Design comprehensive tests and evaluate student performance metrics</p>
+                </div>
+                <div className="lesson-stats">
+                  <span className="stat-item">
+                    <svg className="stat-icon" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
+                    </svg>
+                    Multi-Format
+                  </span>
+                  <span className="stat-item">
+                    <svg className="stat-icon" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/>
+                    </svg>
+                    Auto-Grading
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Homework Assignment - Third, Coming Soon */}
+            <div className="task-card-subject disabled task-card-homework">
+              <div className="coming-soon-badge">Coming Soon</div>
+              <div className="task-card-header">
+                <div className="task-title-with-icon">
+                  <div className="task-type-icon task-icon-homework">
+                    <IconBook />
+                  </div>
+                  <h3 className="task-title">Homework Assignment</h3>
+                </div>
+                <div className="task-arrow-btn">
+                  <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div className="task-card-content">
+                <div className="homework-preview-box">
+                  <div className="homework-stack">
+                    <div className="homework-page homework-page-1">
+                      <div className="homework-page-content">
+                        <div className="homework-line"></div>
+                        <div className="homework-line"></div>
+                        <div className="homework-line short"></div>
+                      </div>
+                      <div className="homework-pencil">
+                        <svg className="pencil-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="homework-page homework-page-2">
+                      <div className="homework-page-content">
+                        <div className="homework-line"></div>
+                        <div className="homework-line"></div>
+                        <div className="homework-line short"></div>
+                      </div>
+                    </div>
+                    <div className="homework-page homework-page-3">
+                      <div className="homework-page-content">
+                        <div className="homework-line"></div>
+                        <div className="homework-line"></div>
+                        <div className="homework-line short"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="homework-badge">3 Pages</div>
+                </div>
+                <div className="lesson-type-description">
+                  <p className="lesson-type-title">Personalized Assignments</p>
+                  <p className="lesson-type-text">Create, distribute, and manage homework assignments for your students</p>
+                </div>
+                <div className="lesson-stats">
+                  <span className="stat-item">
+                    <svg className="stat-icon" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5z" clipRule="evenodd"/>
+                    </svg>
+                    Individualized
+                  </span>
+                  <span className="stat-item">
+                    <svg className="stat-icon" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z" clipRule="evenodd"/>
+                    </svg>
+                    Track Progress
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1055,49 +1226,37 @@ const MainAppPage: React.FC = () => {
                 >
                   <div className="content-type-icon">
                     {type === "video" && (
-                      <img src="/Video.png" alt="Video" />
+                      <img src="/Video.png" alt="Video" className="content-icon-image" />
                     )}
                     {type === "presentation" && (
-                      <img src="/Presentation.png" alt="Presentation" />
+                      <img src="/Presentation.png" alt="Presentation" className="content-icon-image" />
                     )}
                     {type === "flashcard" && (
-                      <img src="/Flashcard.png" alt="Flashcard" />
+                      <img src="/Flashcard.png" alt="Flashcard" className="content-icon-image" />
                     )}
                     {type === "pdf" && (
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#e67e50"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <line x1="9" y1="15" x2="15" y2="15" />
-                        <line x1="9" y1="18" x2="15" y2="18" />
-                        <line x1="9" y1="12" x2="13" y2="12" />
-                      </svg>
+                      <img src="/file.svg" alt="PDF Document" className="content-icon-image" />
                     )}
                     {type === "mindmap" && (
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#9370db"
-                        strokeWidth="2"
-                        strokeLinecap="round"
+                      <svg 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
                         strokeLinejoin="round"
+                        className="mindmap-icon"
                       >
-                        <circle cx="12" cy="12" r="3" />
-                        <circle cx="6" cy="6" r="2" />
-                        <circle cx="18" cy="6" r="2" />
-                        <circle cx="6" cy="18" r="2" />
-                        <circle cx="18" cy="18" r="2" />
-                        <line x1="12" y1="9" x2="12" y2="6" />
-                        <line x1="10.5" y1="10.5" x2="7.5" y2="7.5" />
-                        <line x1="13.5" y1="10.5" x2="16.5" y2="7.5" />
-                        <line x1="10.5" y1="13.5" x2="7.5" y2="16.5" />
-                        <line x1="13.5" y1="13.5" x2="16.5" y2="16.5" />
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <circle cx="6" cy="6" r="2"></circle>
+                        <circle cx="18" cy="6" r="2"></circle>
+                        <circle cx="6" cy="18" r="2"></circle>
+                        <circle cx="18" cy="18" r="2"></circle>
+                        <line x1="12" y1="9" x2="12" y2="6"></line>
+                        <line x1="10.5" y1="10.5" x2="7.5" y2="7.5"></line>
+                        <line x1="13.5" y1="10.5" x2="16.5" y2="7.5"></line>
+                        <line x1="10.5" y1="13.5" x2="7.5" y2="16.5"></line>
+                        <line x1="13.5" y1="13.5" x2="16.5" y2="16.5"></line>
                       </svg>
                     )}
                   </div>
@@ -1737,6 +1896,477 @@ const MainAppPage: React.FC = () => {
     </section>
   );
 
+  const renderMindMapSection = () => (
+    <section
+      id="mindMapSection"
+      className="content-section mindmap-viewer-section active"
+    >
+      <div className="mindmap-viewer-wrapper">
+        <div className="mindmap-viewer-header">
+          <h2 className="mindmap-viewer-title">Your Mind Map</h2>
+          <p className="mindmap-viewer-subtitle">
+            Visual representation of your lesson concepts
+          </p>
+        </div>
+        <div className="mindmap-container">
+          <div className="mindmap-display">
+            <svg
+              viewBox="0 0 1000 700"
+              className="mindmap-svg"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {/* Central Node */}
+              <circle
+                cx="500"
+                cy="350"
+                r="80"
+                fill="#4a7c7c"
+                stroke="#243838"
+                strokeWidth="3"
+                className="mindmap-node mindmap-node-central"
+              />
+              <text
+                x="500"
+                y="360"
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="20"
+                fontWeight="700"
+                className="mindmap-text"
+              >
+                Photosynthesis
+              </text>
+
+              {/* Top Branch - Process */}
+              <line
+                x1="500"
+                y1="270"
+                x2="500"
+                y2="200"
+                stroke="#4a7c7c"
+                strokeWidth="3"
+                className="mindmap-line"
+              />
+              <circle
+                cx="500"
+                cy="150"
+                r="60"
+                fill="#70ad47"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="500"
+                y="160"
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="16"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                Process
+              </text>
+
+              {/* Top Left - Light */}
+              <line
+                x1="500"
+                y1="150"
+                x2="350"
+                y2="100"
+                stroke="#70ad47"
+                strokeWidth="2"
+                className="mindmap-line"
+              />
+              <circle
+                cx="300"
+                cy="80"
+                r="50"
+                fill="#ffc000"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="300"
+                y="88"
+                textAnchor="middle"
+                fill="#243838"
+                fontSize="14"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                Light
+              </text>
+
+              {/* Top Right - Water */}
+              <line
+                x1="500"
+                y1="150"
+                x2="650"
+                y2="100"
+                stroke="#70ad47"
+                strokeWidth="2"
+                className="mindmap-line"
+              />
+              <circle
+                cx="700"
+                cy="80"
+                r="50"
+                fill="#5b9bd5"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="700"
+                y="88"
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="14"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                Water
+              </text>
+
+              {/* Left Branch - Reactants */}
+              <line
+                x1="420"
+                y1="350"
+                x2="300"
+                y2="350"
+                stroke="#4a7c7c"
+                strokeWidth="3"
+                className="mindmap-line"
+              />
+              <circle
+                cx="200"
+                cy="350"
+                r="60"
+                fill="#ed7d31"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="200"
+                y="360"
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="16"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                Reactants
+              </text>
+
+              {/* Left Top - CO2 */}
+              <line
+                x1="200"
+                y1="290"
+                x2="150"
+                y2="250"
+                stroke="#ed7d31"
+                strokeWidth="2"
+                className="mindmap-line"
+              />
+              <circle
+                cx="100"
+                cy="220"
+                r="45"
+                fill="#c55a8a"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="100"
+                y="228"
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="13"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                CO₂
+              </text>
+
+              {/* Left Bottom - Minerals */}
+              <line
+                x1="200"
+                y1="410"
+                x2="150"
+                y2="450"
+                stroke="#ed7d31"
+                strokeWidth="2"
+                className="mindmap-line"
+              />
+              <circle
+                cx="100"
+                cy="480"
+                r="45"
+                fill="#c55a8a"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="100"
+                y="488"
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="13"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                Minerals
+              </text>
+
+              {/* Right Branch - Products */}
+              <line
+                x1="580"
+                y1="350"
+                x2="700"
+                y2="350"
+                stroke="#4a7c7c"
+                strokeWidth="3"
+                className="mindmap-line"
+              />
+              <circle
+                cx="800"
+                cy="350"
+                r="60"
+                fill="#70ad47"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="800"
+                y="360"
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="16"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                Products
+              </text>
+
+              {/* Right Top - Oxygen */}
+              <line
+                x1="800"
+                y1="290"
+                x2="850"
+                y2="250"
+                stroke="#70ad47"
+                strokeWidth="2"
+                className="mindmap-line"
+              />
+              <circle
+                cx="900"
+                cy="220"
+                r="45"
+                fill="#5b9bd5"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="900"
+                y="228"
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="13"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                O₂
+              </text>
+
+              {/* Right Bottom - Glucose */}
+              <line
+                x1="800"
+                y1="410"
+                x2="850"
+                y2="450"
+                stroke="#70ad47"
+                strokeWidth="2"
+                className="mindmap-line"
+              />
+              <circle
+                cx="900"
+                cy="480"
+                r="45"
+                fill="#ffc000"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="900"
+                y="488"
+                textAnchor="middle"
+                fill="#243838"
+                fontSize="13"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                Glucose
+              </text>
+
+              {/* Bottom Branch - Importance */}
+              <line
+                x1="500"
+                y1="430"
+                x2="500"
+                y2="550"
+                stroke="#4a7c7c"
+                strokeWidth="3"
+                className="mindmap-line"
+              />
+              <circle
+                cx="500"
+                cy="600"
+                r="60"
+                fill="#9c27b0"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="500"
+                y="610"
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="16"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                Importance
+              </text>
+
+              {/* Bottom Left - Life */}
+              <line
+                x1="440"
+                y1="600"
+                x2="380"
+                y2="620"
+                stroke="#9c27b0"
+                strokeWidth="2"
+                className="mindmap-line"
+              />
+              <circle
+                cx="320"
+                cy="640"
+                r="45"
+                fill="#c55a8a"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="320"
+                y="648"
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="13"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                Life
+              </text>
+
+              {/* Bottom Right - Energy */}
+              <line
+                x1="560"
+                y1="600"
+                x2="620"
+                y2="620"
+                stroke="#9c27b0"
+                strokeWidth="2"
+                className="mindmap-line"
+              />
+              <circle
+                cx="680"
+                cy="640"
+                r="45"
+                fill="#c55a8a"
+                stroke="#243838"
+                strokeWidth="2"
+                className="mindmap-node"
+              />
+              <text
+                x="680"
+                y="648"
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="13"
+                fontWeight="600"
+                className="mindmap-text"
+              >
+                Energy
+              </text>
+            </svg>
+          </div>
+        </div>
+        <div className="mindmap-viewer-actions">
+          <button
+            type="button"
+            className="btn-mindmap-action btn-download-mindmap"
+            onClick={() => {
+              const svg = document.querySelector(".mindmap-svg");
+              if (svg) {
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const blob = new Blob([svgData], {
+                  type: "image/svg+xml;charset=utf-8",
+                });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "mindmap.svg";
+                link.click();
+                URL.revokeObjectURL(url);
+              }
+            }}
+          >
+            <IconUpload />
+            Download Mind Map
+          </button>
+          <button
+            type="button"
+            className="btn-mindmap-action btn-print-mindmap"
+            onClick={() => window.print()}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: "18px", height: "18px" }}
+            >
+              <polyline points="6 9 6 2 18 2 18 9" />
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+              <rect x="6" y="14" width="12" height="8" />
+            </svg>
+            Print
+          </button>
+          <button
+            type="button"
+            className="btn-mindmap-action btn-back-home-mindmap"
+            onClick={handleGoBackToHomeView}
+          >
+            <IconHome />
+            Back to Home
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+
   const renderProfileSection = () => (
     <section id="profile" className="content-section active">
       <div className="content-header">
@@ -2093,24 +2723,55 @@ const MainAppPage: React.FC = () => {
 
       {/* Main Content */}
       <main className="main-content">
-        {activeSection === "home" && homeView === "builder" && (
-          renderHomeBuilder()
-        )}
-        {activeSection === "home" && homeView === "flashcards" && (
-          renderFlashcardsSection()
-        )}
-        {activeSection === "home" && homeView === "pdf" && (
-          renderPdfViewerSection()
-        )}
-        {activeSection === "home" &&
-          homeView === "presentation" &&
-          renderPresentationViewerSection()}
-        {activeSection === "home" && homeView === "video" && (
-          renderVideoPlayerSection()
-        )}
-        {activeSection === "profile" && renderProfileSection()}
-        {activeSection === "analytics" && renderAnalyticsSection()}
-        {activeSection === "knowledge" && renderKnowledgeSection()}
+        {/* Decorative Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Large overlapping circles creating the abstract background pattern */}
+          <div className="main-app-circle-1 absolute rounded-full"></div>
+          <div className="main-app-circle-2 absolute rounded-full"></div>
+          <div className="main-app-circle-3 absolute rounded-full"></div>
+          <div className="main-app-circle-4 absolute rounded-full"></div>
+          <div className="main-app-circle-5 absolute rounded-full"></div>
+          <div className="main-app-circle-6 absolute rounded-full"></div>
+          <div className="main-app-circle-7 absolute rounded-full"></div>
+          
+          {/* Subtle grid lines for depth */}
+          <div className="absolute inset-0">
+            <div className="main-app-grid-line absolute left-[15%] top-0 bottom-0 w-[1px]"></div>
+            <div className="main-app-grid-line absolute left-[30%] top-0 bottom-0 w-[1px]"></div>
+            <div className="main-app-grid-line absolute left-[45%] top-0 bottom-0 w-[1px]"></div>
+            <div className="main-app-grid-line absolute left-[60%] top-0 bottom-0 w-[1px]"></div>
+            <div className="main-app-grid-line absolute left-[75%] top-0 bottom-0 w-[1px]"></div>
+            
+            <div className="main-app-grid-line absolute top-[20%] left-0 right-0 h-[1px]"></div>
+            <div className="main-app-grid-line absolute top-[40%] left-0 right-0 h-[1px]"></div>
+            <div className="main-app-grid-line absolute top-[60%] left-0 right-0 h-[1px]"></div>
+            <div className="main-app-grid-line absolute top-[80%] left-0 right-0 h-[1px]"></div>
+          </div>
+        </div>
+
+        <div className="relative z-10">
+          {activeSection === "home" && homeView === "builder" && (
+            renderHomeBuilder()
+          )}
+          {activeSection === "home" && homeView === "flashcards" && (
+            renderFlashcardsSection()
+          )}
+          {activeSection === "home" && homeView === "pdf" && (
+            renderPdfViewerSection()
+          )}
+          {activeSection === "home" &&
+            homeView === "presentation" &&
+            renderPresentationViewerSection()}
+          {activeSection === "home" && homeView === "video" && (
+            renderVideoPlayerSection()
+          )}
+          {activeSection === "home" && homeView === "mindmap" && (
+            renderMindMapSection()
+          )}
+          {activeSection === "profile" && renderProfileSection()}
+          {activeSection === "analytics" && renderAnalyticsSection()}
+          {activeSection === "knowledge" && renderKnowledgeSection()}
+        </div>
       </main>
 
       {/* Loading overlay */}
